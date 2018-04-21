@@ -1,6 +1,5 @@
 # Assignment 1
-##### Image Decryption by a Single-Layer Neural Network
-***
+Image Decryption by a Single-Layer Neural Network
 ## 說明
 #### 加密公式
 ![](images/formula.png)</br>
