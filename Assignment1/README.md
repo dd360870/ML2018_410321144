@@ -28,7 +28,7 @@ Image Decryption by a Single-Layer Neural Network
 ***
 ## 實際訓練結果
 
-<table class="text-center">
+<table>
   <tr>
     <td colspan="3">
       target = E</br>
@@ -68,21 +68,31 @@ Image Decryption by a Single-Layer Neural Network
     <td>N/A</td>
   </tr>
 </table>
+
 #### W 結果
+
 ###### w0 = 0.24948466306990535
+
 ###### w1 = 0.6603639149873232
+
 ###### w2 = 0.0908177168189841
+
 #### Encryptrd Eprime
-</br>
+
 ![](images/training/Eprime.png)
+
 #### Decrypted Eprime
-</br>
+
 ![](images/Eprime-decrypted.png)
-<table>
+
+
 ## 結果討論
+
 依測試結果，以此例子最適合的learning rate為1e-5 ~ 1e-7之間</br>
 就算我將w的初始值調到1000而或是1e10，在上述區間的learning rate下依然是非常快速的就得到了結果</br>
 我的程式碼跟老師的虛擬碼有點不一樣，在while條件的部分，我是將值設為 epochs < 10 OR average_cost > 0.1 </br>
 以利測試在不同learning rate的情況下，所需的iteration是多少
+
 ## 參考資料
+
 <http://sebastianraschka.com/Articles/2015_singlelayer_neurons.html>
