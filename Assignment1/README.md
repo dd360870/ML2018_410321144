@@ -8,9 +8,9 @@ Image Decryption by a Single-Layer Neural Network
 ###### E = 已加密的圖片</br>
 
 #### Image Key 1 (K1)
-![](images/training/Key1.png)
+![](images/training/key1.png)
 #### Image Key 2 (K2)
-![](images/training/Key2.png)
+![](images/training/key2.png)
 #### The Input Image (I)
 ![](images/training/I.png)
 #### The Encrypted Image (E)
@@ -73,8 +73,10 @@ Image Decryption by a Single-Layer Neural Network
 ###### w1 = 0.6603639149873232
 ###### w2 = 0.0908177168189841
 #### Encryptrd Eprime
+</br>
 ![](images/training/Eprime.png)
 #### Decrypted Eprime
+</br>
 ![](images/Eprime-decrypted.png)
 <table>
 ## 結果討論
