@@ -1,13 +1,57 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import struct
+import time
+import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+from sklearn.decomposition import RandomizedPCA
 from sklearn.mixture import GaussianMixture
+from sklearn.tree import DecisionTreeClassifier
+from sklearn import svm
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import scale
+from sklearn.metrics import accuracy_score
+from pathlib import Path
 
 train_images_idx3_ubyte = 'C:\\Users\\Ruzy\\Downloads\\train\\train-images.idx3-ubyte'
 train_labels_idx1_ubyte = 'C:\\Users\\Ruzy\\Downloads\\train\\train-labels.idx1-ubyte'
 t10k_images_idx3_ubyte = 'C:\\Users\\Ruzy\\Downloads\\train\\t10k-images.idx3-ubyte'
 t10k_labels_idx1_ubyte = 'C:\\Users\\Ruzy\\Downloads\\train\\t10k-labels.idx1-ubyte'
+
+
+def read_file():
+    file = Path("train_data.npy")
+    if not file.is_file():
+        train_data = decode_idx3_ubyte(train_images_idx3_ubyte)
+        np.save(file, train_data)
+    else:
+        train_data = np.load(file)
+        print("file exist.")
+    # ---------------------------------------------------------
+    file = Path("train_label.npy")
+    if not file.is_file():
+        train_label = decode_idx1_ubyte(train_labels_idx1_ubyte)
+        np.save(file, train_label)
+    else:
+        train_label = np.load(file)
+        print("file exist.")
+    # ---------------------------------------------------------
+    file = Path("test_data.npy")
+    if not file.is_file():
+        test_data = decode_idx3_ubyte(t10k_images_idx3_ubyte)
+        np.save(file, test_data)
+    else:
+        test_data = np.load(file)
+        print("file exist.")
+    # ---------------------------------------------------------
+    file = Path("test_label.npy")
+    if not file.is_file():
+        test_label = decode_idx1_ubyte(t10k_labels_idx1_ubyte)
+        np.save(file, test_label)
+    else:
+        test_label = np.load(file)
+        print("file exist.")
+    # ---------------------------------------------------------
+    return train_data, train_label, test_data, test_label
 
 
 def decode_idx3_ubyte(idx3_ubyte_file):
@@ -26,11 +70,6 @@ def decode_idx3_ubyte(idx3_ubyte_file):
             print("processing : %d" % (i + 1))
         images[i] = np.array(struct.unpack_from(fmt_image, bin_data, offset))#.reshape((num_rows, num_cols))
         offset += struct.calcsize(fmt_image)
-        """for j in range(num_rows * num_cols):
-            if images[i][j] > 250:
-                images[i][j] = 1
-            else:
-                images[i][j] = 0"""
     return images
 
 
@@ -50,21 +89,34 @@ def decode_idx1_ubyte(idx1_ubyte_file):
     return labels
 
 
-train_images = decode_idx3_ubyte(train_images_idx3_ubyte)
-train_labels = decode_idx1_ubyte(train_labels_idx1_ubyte)
-test_images = decode_idx3_ubyte(t10k_images_idx3_ubyte)
-test_labels = decode_idx1_ubyte(t10k_labels_idx1_ubyte)
+(train_images, train_labels, test_images, test_labels) = read_file()
 
-pca = PCA(n_components=17, copy=False)
+"""for i in range(60000):
+    for j in range(28*28):
+        if train_images[i][j] > 0:
+            train_images[i][j] = 1
+        else:
+            train_images[i][j] = 0
+    if i % 10000 == 0:
+        print(i)"""
+
+pca = PCA(n_components=13, copy=False, svd_solver='randomized')
 pca.fit(train_images)
 train_data = pca.transform(train_images)
 test_data = pca.transform(test_images)
+
+print("PCA done.")
+# train_data = scale(train_data)
+# test_data = scale(test_data)
+
+
 
 """for i in range(10):
     print(train_labels)
     plt.imshow(train_images[i].reshape((28, 28)), cmap='gray')
     plt.show()"""
-K = 10
+
+"""K = 17
 
 gmm = GaussianMixture(n_components=K)
 gmm.fit(X=train_data)
@@ -91,4 +143,22 @@ for i in range(np.alen(result)):
         p += 1
     else:
         n += 1
-print("%d / %d = %f" % (p, n, p / (p + n)))
+print("GMM : =%.2f" % ((p/(p+n))*100.0))"""
+
+
+clf = KNeighborsClassifier(n_neighbors=7)
+t0 = time.time()
+clf.fit(train_data, train_labels)
+t1 = time.time()
+print("kNN fit done {:.3f} sec.".format(t1-t0))
+re = clf.predict(test_data)
+print('kNN : %.2f' % (accuracy_score(test_labels, re)*100.0))
+
+svc_model = svm.SVC()
+t0 = time.time()
+svc_model.fit(train_data, train_labels)
+t1 = time.time()
+print("SVM fit done {:.3f} sec.".format(t1-t0))
+print("fit")
+re = svc_model.predict(test_data)
+print('SVM : %.2f' % (accuracy_score(test_labels, re)*100.0))
