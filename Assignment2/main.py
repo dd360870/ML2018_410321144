@@ -1,11 +1,7 @@
 import numpy as np
 import struct
 import time
-import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
-from sklearn.decomposition import RandomizedPCA
-from sklearn.mixture import GaussianMixture
-from sklearn.tree import DecisionTreeClassifier
 from sklearn import svm
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import scale
@@ -89,76 +85,43 @@ def decode_idx1_ubyte(idx1_ubyte_file):
     return labels
 
 
-(train_images, train_labels, test_images, test_labels) = read_file()
+(train_data, train_labels, test_data, test_labels) = read_file()
 
-"""for i in range(60000):
-    for j in range(28*28):
-        if train_images[i][j] > 0:
-            train_images[i][j] = 1
-        else:
-            train_images[i][j] = 0
-    if i % 10000 == 0:
-        print(i)"""
 
-pca = PCA(n_components=13, copy=False, svd_solver='randomized')
-pca.fit(train_images)
-train_data = pca.transform(train_images)
-test_data = pca.transform(test_images)
+pca = PCA(n_components=35, copy=False)
+pca.fit(train_data)
 
+
+train_data = pca.transform(train_data)
+test_data = pca.transform(test_data)
+train_data = scale(train_data)
+test_data = scale(test_data)
 print("PCA done.")
-# train_data = scale(train_data)
-# test_data = scale(test_data)
 
-
-
-"""for i in range(10):
-    print(train_labels)
-    plt.imshow(train_images[i].reshape((28, 28)), cmap='gray')
-    plt.show()"""
-
-"""K = 17
-
-gmm = GaussianMixture(n_components=K)
-gmm.fit(X=train_data)
-p = 0
-n = 0
-indice_temp = np.zeros((K, 10))
-test = gmm.predict(train_data)
-for i in range(np.alen(test)):
-    indice_temp[int(test[i])][int(train_labels[i])] += 1
-indice = np.empty(K)
-for i in range(K):
-    max = 0
-    lab = None
-    for j in range(10):
-        if indice_temp[i][j] > max:
-            max = indice_temp[i][j]
-            lab = j
-    indice[i] = lab
-
-result = gmm.predict(test_data)
-
-for i in range(np.alen(result)):
-    if indice[int(result[i])] == test_labels[i]:
-        p += 1
-    else:
-        n += 1
-print("GMM : =%.2f" % ((p/(p+n))*100.0))"""
-
-
-clf = KNeighborsClassifier(n_neighbors=7)
+knn = KNeighborsClassifier(n_neighbors=7)
 t0 = time.time()
-clf.fit(train_data, train_labels)
+knn.fit(train_data, train_labels)
 t1 = time.time()
 print("kNN fit done {:.3f} sec.".format(t1-t0))
-re = clf.predict(test_data)
-print('kNN : %.2f' % (accuracy_score(test_labels, re)*100.0))
+t0 = time.time()
+re = knn.predict(train_data)
+t1 = time.time()
+print('kNN train accuracy: {:.2f}% in {:.3f} sec'.format(accuracy_score(train_labels, re)*100.0, t1-t0))
+t0 = time.time()
+re = knn.predict(test_data)
+t1 = time.time()
+print('kNN test accuracy: {:.2f}% in {:.3f} sec'.format(accuracy_score(test_labels, re)*100.0, t1-t0))
 
 svc_model = svm.SVC()
 t0 = time.time()
 svc_model.fit(train_data, train_labels)
 t1 = time.time()
 print("SVM fit done {:.3f} sec.".format(t1-t0))
-print("fit")
+t0 = time.time()
+re = svc_model.predict(train_data)
+t1 = time.time()
+print('SVM train accuracy: {:.2f}% in {:.3f} sec'.format(accuracy_score(train_labels, re)*100.0, t1-t0))
+t0 = time.time()
 re = svc_model.predict(test_data)
-print('SVM : %.2f' % (accuracy_score(test_labels, re)*100.0))
+t1 = time.time()
+print('SVM test accuracy: {:.2f}% in {:.3f} sec'.format(accuracy_score(test_labels, re)*100.0, t1-t0))
