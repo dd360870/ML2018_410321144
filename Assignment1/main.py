@@ -59,9 +59,12 @@ plt.plot(range(1, len(ada.cost)), ada.cost[1:], marker='o')
 plt.xlabel('Iterations')
 plt.ylabel('Sum-squared-error')
 plt.title('Learning rate 1e-5')
-plt.show()
+# plt.show()
 print(ada.w)
 for i in range(0, width):
     for j in range(0, height):
-        output.putpixel((i, j), int(round((Eprime.getpixel((i, j))-ada.w[0]*K1.getpixel((i, j))-ada.w[1]*K2.getpixel((i, j)))/ada.w[2])))
+        v = int(round((Eprime.getpixel((i, j))-ada.w[0]*K1.getpixel((i, j))-ada.w[1]*K2.getpixel((i, j)))/ada.w[2]))
+        # if v > 255 or v < 0:
+        #     print(v)
+        output.putpixel((i, j), v)
 output.save("Eprime-decrypted.png")
