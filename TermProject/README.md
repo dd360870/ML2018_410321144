@@ -46,6 +46,8 @@ dlib                   19.13.1<br>
     train acc : 100.00%
     test acc : 80.00%
     --------------------
+原先沒有加入face detection的時候，辨識結果一直不太好，想說可能是每張圖臉的位置角度都不太一樣，所以加入face detection把每張臉的位置抓出來&轉正，增加辨識率。<br>
 因每次train_data & test_data抓出來的部分隨機選擇，所以每次辨識的結果都不太一樣，test acc大約在70~85%左右
+不過在實驗室測試時，結果比較好，我想是因為有比較多的人臉進去訓練，所以結果更加準確。
 ### 參考資料
 <a href="http://dlib.net/">dlib C++ Library</a>
